@@ -11,6 +11,7 @@ import Stack from '@mui/material/Stack';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import {useIMQA} from "imqa-react-sdk";
 
 toast.configure();
 
@@ -31,22 +32,22 @@ const style = {
 
 
 export default function DonateModal({req,updateFunction}) {
-
-  useEffect(() => {    
-      var url = APIIP.ip+"/users/"+localStorage.getItem("userId")+"/wallet?sessionKey="+localStorage.getItem("sessionKey");        
+    const IMQARef = useIMQA(); // 삽입
+  useEffect(() => {
+      var url = APIIP.ip+"/users/"+localStorage.getItem("userId")+"/wallet?sessionKey="+localStorage.getItem("sessionKey");
         if(localStorage.getItem("sessionKey")!==null) fetch(url)
-        .then((response)=> {          
+        .then((response)=> {
           if(response.status === 200){
             return response.json();
           }
           else{
             return null;
-          }}).then((response => {                 
-          setWalletBalance(response.balance);            
+          }}).then((response => {
+          setWalletBalance(response.balance);
         }));
-    
+
   },[])
-  
+
   const notify = (msg,Type) => {
     toast(msg,{
         type: Type,
@@ -55,8 +56,8 @@ export default function DonateModal({req,updateFunction}) {
   }
   function makeDonation(){
     let obj = {
-      donationAmount: donationAmount,      
-      donationDescription: donationDescription    
+      donationAmount: donationAmount,
+      donationDescription: donationDescription
     }
     console.log(obj);
     fetch(APIIP.ip+'/requests/'+req.requestId+'/donate?sessionKey='+localStorage.getItem('sessionKey'), {
@@ -69,22 +70,22 @@ export default function DonateModal({req,updateFunction}) {
           if(response.ok) {
               notify("Donation succeed","success")
               var url = APIIP.ip+"/users/"+localStorage.getItem("userId")+"/wallet?sessionKey="+localStorage.getItem("sessionKey");
-        
+
               fetch(url)
               .then((response)=> response.json())
-              .then((response => {                        
-                setWalletBalance(response.balance);            
+              .then((response => {
+                setWalletBalance(response.balance);
               }));
-              return response.json(); 
+              return response.json();
           }else{
               notify("Donation Failed","warning");
           }
       }).then(json => {
-        setWalletBalance(0);                    
+        setWalletBalance(0);
       })
-      .catch(err => console.log(err));   
- 
-        
+      .catch(err => console.log(err));
+
+
   }
 
   const [open, setOpen] = React.useState(false);
@@ -94,6 +95,7 @@ export default function DonateModal({req,updateFunction}) {
   const [donationAmount,setDonationAmount] = useState(10);
   const [donationDescription,setDonationDescription] = useState("");
   return (
+      <div ref={IMQARef}>
     <div>
       <Button className="contibute-btn" onClick={handleOpen}>♥ Contibute Now</Button>
 
@@ -101,9 +103,9 @@ export default function DonateModal({req,updateFunction}) {
         <Box sx={style}>
           {
             (localStorage.getItem("sessionKey")!==null && (req.amountRequired-req.amountRecieved)>0)
-            ?            
+            ?
             <>
-              <div>                                
+              <div>
                 <TextField required id="outlined-basic" label="Say something about donation.." variant="outlined" onChange={(e) => {setDonationDescription(e.target.value)}}/>
                 </div>
                 <br />
@@ -111,23 +113,24 @@ export default function DonateModal({req,updateFunction}) {
                   Your Wallet Balance : ₹{walletBalance}
                 </Typography>
 
-               
+
                 <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
                   {10+"₹ "}
-                  
-                  
+
+
                   <Slider value={donationAmount} onChange={(e)=> {setDonationAmount(e.target.value)}} min={10} max={( (req.amountRequired-req.amountRecieved)<=walletBalance ? (req.amountRequired-req.amountRecieved) : walletBalance)} defaultValue={60} aria-label="Default" valueLabelDisplay="auto" />
                   {( (req.amountRequired-req.amountRecieved)<=walletBalance ? (req.amountRequired-req.amountRecieved) : walletBalance)+"₹"}
-                </Stack>                    
+                </Stack>
                 <TextField id="standard-basic" onChange={(e)=> {setDonationAmount(e.target.value)}} value={donationAmount} label="₹ Amount to Donate" variant="standard" />
                 <Button onClick={()=> {makeDonation();handleClose();}} className="modal-donate-btn" variant="contained"><i className="fa fa-heart" aria-hidden="true"></i> &nbsp;Donate</Button>
-              
-            </>              
+
+            </>
             :
             <Link to="/login"> <Button variant="contained" className="modal-donate-btn">Login Now To Donate</Button></Link>
-          }          
+          }
         </Box>
       </Modal>
     </div>
+      </div> // 삽입
   );
 }

@@ -1,10 +1,14 @@
+import {useIMQA} from "imqa-react-sdk";
+
 const EducationInformation = ({alterValues}) => {
+    const IMQARef = useIMQA(); // 삽입
 
     function loginUser(e,key,value){
-        e.preventDefault();  
-        alterValues(key,value)  
+        e.preventDefault();
+        alterValues(key,value)
     }
-    return ( 
+    return (
+        <div ref={IMQARef}>
         <div className="d-flex justify-content-center ">
             <div className="card mt-2 col-xl-6 col-sm-12" style={{overflow: 'auto',width: '100%'}}>
                 <form className="card-body">
@@ -41,7 +45,8 @@ const EducationInformation = ({alterValues}) => {
                 </form>
             </div>
         </div>
+        </div>
      );
 }
- 
+
 export default EducationInformation;

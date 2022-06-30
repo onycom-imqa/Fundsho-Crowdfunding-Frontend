@@ -8,15 +8,14 @@ var arr= [880,881,882,883,885,886,887,889,890,891,892,893,895,896,897,898,899,90
 
 
 
-for(let i=0;i<arr.length;i++){          
+for(let i=0;i<arr.length;i++){
     fetch("https://picsum.photos/550/300",{
         method:'Get',
         headers: {
             'Content-Type': 'application/json',
-          },
+        },
     }).then(response=>console.log("UPDATE users_request set event_image_url='"+response.url+"' WHERE request_id="+arr[i]+";"))
 }
-
 
 
 

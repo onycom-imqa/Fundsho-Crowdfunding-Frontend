@@ -1,32 +1,36 @@
 import { APIIP } from "../Settings/config";
+import {useIMQA} from "imqa-react-sdk";
+
 const EventInformation = ({alterValues}) => {
+    const IMQARef = useIMQA(); // 삽입
 
     function loginUser(e,key,value){
-        if(e!==null) e.preventDefault();  
-        alterValues(key,value)  
+        if(e!==null) e.preventDefault();
+        alterValues(key,value)
     }
 
     function uploadFiles(e){
         const formData  = new FormData();
-        formData.append('file',e.target.files[0]);        
-        
+        formData.append('file',e.target.files[0]);
+
         fetch(APIIP.ip+"/images",{
          method: 'POST',
          body: formData
         }).then(res => res.json())
         .then(data => { loginUser(null,'eventImageUrl',data.url)})
-    
-        }      
+
+        }
 
 
-    return ( 
+    return (
+        <div ref={IMQARef}>
         <div className="d-flex justify-content-center col-sm-12">
             <div className="card mt-2 col-xl-6 col-sm-12" style={{overflow: 'auto',width: '100%'}}>
-                <form className="card-body">                    
+                <form className="card-body">
                     <div className="form-group">
                         <label htmlFor="schoolName">Event Name</label>
                         <input type="text" onChange={(e) =>{ loginUser(e,"eventTitle",e.target.value)}}  className="form-control" name="eventName" placeholder="Event Name" />
-                    </div>            
+                    </div>
                     <div className="form-group">
                         <label htmlFor="schoolName">Event Date</label>
                         <input type="date"  onChange={(e) =>{ loginUser(e,"deadLine",e.target.value)}} className="form-control" name="eventDate" placeholder="Event Date" />
@@ -43,7 +47,8 @@ const EventInformation = ({alterValues}) => {
                 </form>
             </div>
         </div>
+        </div>
      );
 }
- 
+
 export default EventInformation;

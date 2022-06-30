@@ -10,6 +10,7 @@ import EducationInformation from './EducationInformation';
 import EventInformation from './EventInformation';
 import PersonalInformation from './PersonalInformationForm';
 import {APIIP} from '../Settings/config';
+import {useIMQA} from "imqa-react-sdk";
 
 const steps = ['Fundraiser Information', 'Education Information', 'Event Information'];
 var raisingData = {
@@ -37,10 +38,12 @@ var raisingData = {
     "sessionId": "string"
   };
 export default function NewFundraiser() {
-  const [activeStep, setActiveStep] = React.useState(0);    
-  
+    const IMQARef = useIMQA(); // 삽입
 
-  function alterValues(key,value){ 
+  const [activeStep, setActiveStep] = React.useState(0);
+
+
+  function alterValues(key,value){
     raisingData[key] = value;
     console.log(raisingData);
   }
@@ -53,14 +56,14 @@ export default function NewFundraiser() {
         },
         body: JSON.stringify(raisingData)
     }).then(res => res.json())
-    .then(data => { 
+    .then(data => {
         console.log(data);
     });
   }
 
 
 
-  const handleNext = () => {    
+  const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     if(activeStep+1===steps.length){
       raiseEvent();
@@ -70,9 +73,10 @@ export default function NewFundraiser() {
   const handleBack = () => {setActiveStep((prevActiveStep) => prevActiveStep - 1);};
 
 
-  
+
 
   return (
+      <div ref={IMQARef}>
     <>
     <Navbar/>
     <div className="d-flex justify-content-center">
@@ -80,7 +84,7 @@ export default function NewFundraiser() {
             <Stepper activeStep={activeStep}>
                 {steps.map((label, index) => {
                     const stepProps = {};
-                    const labelProps = {};                                    
+                    const labelProps = {};
                     return (
                         <Step key={label} {...stepProps}>
                             <StepLabel {...labelProps}>{label}</StepLabel>
@@ -90,26 +94,27 @@ export default function NewFundraiser() {
             </Stepper>
 
             {
-            activeStep === steps.length ?    
+            activeStep === steps.length ?
             <>
-                <Typography sx={{ mt: 2, mb: 1 }}> All steps completed - you&apos;re finished </Typography> 
+                <Typography sx={{ mt: 2, mb: 1 }}> All steps completed - you&apos;re finished </Typography>
                 <span></span>
-                </>  
-                                           
-            :         
+                </>
+
+            :
                 <React.Fragment>
-                    {activeStep === 0 && (  <PersonalInformation alterValues={alterValues}/>  )}                
-                    {activeStep === 1 && <EducationInformation alterValues={alterValues}/>}    
-                    {activeStep === 2 && <EventInformation alterValues={alterValues}/> }    
+                    {activeStep === 0 && (  <PersonalInformation alterValues={alterValues}/>  )}
+                    {activeStep === 1 && <EducationInformation alterValues={alterValues}/>}
+                    {activeStep === 2 && <EventInformation alterValues={alterValues}/> }
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                         <Button color="inherit" disabled={activeStep === 0} onClick={handleBack}sx={{ mr: 1 }}>Back</Button>
-                        <Box sx={{ flex: '1 1 auto' }} />                        
+                        <Box sx={{ flex: '1 1 auto' }} />
                         <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Submit' : 'Next'}</Button>
                     </Box>
-                </React.Fragment>                
+                </React.Fragment>
             }
         </Box>
         </div>
     </>
+      </div>
   );
 }
